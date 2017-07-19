@@ -118,6 +118,7 @@ public class CircleView extends View {
         canvas.restoreToCount(sc);
     }
 
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
