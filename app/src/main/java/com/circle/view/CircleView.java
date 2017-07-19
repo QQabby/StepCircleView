@@ -26,7 +26,9 @@ public class CircleView extends View {
 
     Bitmap bottomBitmap;
     Bitmap upBitmap;
-    Paint paint;
+    Paint circlePaint;
+    PorterDuffXfermode mPorterMode;
+    RectF rectF;
 
     /**
      * 结尾数
@@ -41,6 +43,7 @@ public class CircleView extends View {
     float strokeWidth = 0;
 
     float mXmlStrokeWidth;
+
     public CircleView(Context context) {
         this(context, null);
     }
@@ -66,11 +69,14 @@ public class CircleView extends View {
         bottomBitmap = BitmapFactory.decodeResource(getResources(), mBottomResId);
         upBitmap = BitmapFactory.decodeResource(getResources(), mUpResId);
         strokeWidth = upBitmap.getHeight() / 20f;
-        Log.i("xx","strokeWidth::"+strokeWidth);
+        Log.i("xx", "strokeWidth::" + strokeWidth);
         //mXmlStrokeWidth = typedArray.getDimension(R.styleable.CircleView_strokeWidth,strokeWidth);
-        paint = new Paint();
+        circlePaint = new Paint();
+        rectF = new RectF();
 
-        paint.setAntiAlias(true);
+        mPorterMode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+
+        circlePaint.setAntiAlias(true);
 
         startAnimation();
     }
@@ -80,7 +86,7 @@ public class CircleView extends View {
         super.onDraw(canvas);
 
         canvas.drawBitmap(bottomBitmap, (getWidth() - bottomBitmap.getWidth()) / 2
-                , (getHeight() - bottomBitmap.getHeight()) / 2, paint);
+                , (getHeight() - bottomBitmap.getHeight()) / 2, circlePaint);
 
         int sc = canvas.saveLayer(0, 0, getWidth(), getHeight(), null,
                 Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG
@@ -88,7 +94,6 @@ public class CircleView extends View {
                         | Canvas.FULL_COLOR_LAYER_SAVE_FLAG
                         | Canvas.CLIP_TO_LAYER_SAVE_FLAG);
 
-        Paint circlePaint = new Paint();
         //设置属性
         circlePaint.setColor(Color.YELLOW);
         circlePaint.setStyle(Paint.Style.STROKE);
@@ -96,7 +101,7 @@ public class CircleView extends View {
         circlePaint.setStrokeCap(Paint.Cap.ROUND);
         circlePaint.setStrokeWidth(strokeWidth * 2);
 
-        RectF rectF = new RectF();
+
         rectF.left = getWidth() / 2 - bottomBitmap.getWidth() / 2 + strokeWidth;
         rectF.right = getWidth() / 2 + bottomBitmap.getWidth() / 2 - strokeWidth;
         rectF.top = getHeight() / 2 - bottomBitmap.getHeight() / 2 + strokeWidth;
@@ -104,7 +109,7 @@ public class CircleView extends View {
 
         //画圆弧
         canvas.drawArc(rectF, startAngle, tempAngle, false, circlePaint);//SRC_IN
-        circlePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        circlePaint.setXfermode(mPorterMode);
         //画上面的圆 彩虹
         canvas.drawBitmap(upBitmap, (getWidth() - upBitmap.getWidth()) / 2
                 , (getHeight() - upBitmap.getHeight()) / 2, circlePaint);
@@ -144,8 +149,6 @@ public class CircleView extends View {
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap newBit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-
 
 
         return newBit;
